@@ -6,9 +6,9 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-///////////////////////////
+// /////////////////////////
 // JSON Response From API
-///////////////////////////
+// /////////////////////////
 type SingleOdd struct {
 	ID           string       `json:"id"`
 	SportKey     string       `json:"sport_key"`
@@ -34,9 +34,9 @@ type Bookmakers struct {
 	Markets    []Markets `json:"markets"`
 }
 
-///////////////////////////////
+// /////////////////////////////
 // Internal calculation holder
-///////////////////////////////
+// /////////////////////////////
 type SingleGame struct {
 	HomeTeam   string
 	AwayTeam   string
@@ -44,5 +44,6 @@ type SingleGame struct {
 	AwayPrice  decimal.Decimal
 	PriceCount decimal.Decimal
 	PriceDiff  decimal.Decimal
+	Rank       int
 	GameTime   time.Time
 }

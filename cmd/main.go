@@ -31,7 +31,7 @@ func main() {
 
 	keyByt, err = os.ReadFile(KeyLocation)
 	if err != nil {
-		fmt.Printf("Error opening key file: %w\n", err)
+		fmt.Printf("Error opening key file: %s\n", err.Error())
 		os.Exit(1)
 	}
 
@@ -39,7 +39,7 @@ func main() {
 
 	resp, err = client.Get(APIURL + keyVal)
 	if err != nil {
-		fmt.Printf("Error getting API: %w\n", err)
+		fmt.Printf("Error getting API: %s\n", err.Error())
 		os.Exit(1)
 	}
 	defer resp.Body.Close()
@@ -61,5 +61,5 @@ func main() {
 		calc.AddGame(gOdd)
 	}
 
-	calc.PrintRaw()
+	calc.PrintRanked()
 }

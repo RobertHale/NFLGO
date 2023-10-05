@@ -5,8 +5,10 @@ import (
 	"os"
 	"sort"
 	"text/tabwriter"
+	"time"
 
 	"github.com/shopspring/decimal"
+	"golang.org/x/exp/slices"
 	"spikenet.com/nflgo/internal/models"
 )
 
@@ -28,7 +30,7 @@ func (c *CalcArr) AddGame(odd models.SingleOdd) {
 			HomePrice:  decimal.NewFromInt(0),
 			AwayPrice:  decimal.NewFromInt(0),
 			PriceCount: decimal.NewFromInt(0),
-			GameTime:   odd.CommenceTime,
+			GameTime:   odd.CommenceTime.Local(),
 		}
 		inc = decimal.NewFromInt(1)
 	)
@@ -56,6 +58,7 @@ func (c *CalcArr) AddGame(odd models.SingleOdd) {
 
 	game.HomePrice = game.HomePrice.Div(game.PriceCount)
 	game.AwayPrice = game.AwayPrice.Div(game.PriceCount)
+	game.PriceDiff = game.HomePrice.Sub(game.AwayPrice).Abs()
 
 	*c = append(*c, game)
 }
@@ -66,11 +69,36 @@ func (c *CalcArr) PrintRaw() {
 	sort.Sort(tempC)
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight|tabwriter.Debug)
-	fmt.Fprintln(w, "HomeTeam\tHomeOdds\tAwayTeam\tAwayOdds\tGameTime\t")
+	fmt.Fprintln(w, "HomeTeam\tHomeOdds\tAwayTeam\tAwayOdds\rRank\tGameTime\t")
 
 	for _, game := range tempC {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", game.HomeTeam, game.HomePrice, game.AwayTeam, game.AwayPrice, game.GameTime)
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%s\t\n", game.HomeTeam, game.HomePrice, game.AwayTeam, game.AwayPrice, game.Rank, game.GameTime.Format(time.RFC1123))
 	}
 
 	w.Flush()
+}
+
+func (c *CalcArr) PrintRanked() {
+	var (
+		rankMap = make(map[float64]models.SingleGame)
+		diffArr = []float64{}
+		tempC   = *c
+	)
+
+	for _, game := range tempC {
+		diffF := game.PriceDiff.InexactFloat64()
+		diffArr = append(diffArr, diffF)
+		rankMap[diffF] = game
+	}
+
+	slices.Sort(diffArr)
+
+	tempC = CalcArr{}
+	for i, diff := range diffArr {
+		temp := rankMap[diff]
+		temp.Rank = i + 1
+		tempC = append(tempC, temp)
+	}
+
+	tempC.PrintRaw()
 }
