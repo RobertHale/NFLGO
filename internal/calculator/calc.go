@@ -69,10 +69,10 @@ func (c *CalcArr) PrintRaw() {
 	sort.Sort(tempC)
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight|tabwriter.Debug)
-	fmt.Fprintln(w, "HomeTeam\tHomeOdds\tAwayTeam\tAwayOdds\rRank\tGameTime\t")
+	fmt.Fprintln(w, "HomeTeam\tHomeOdds\tAwayTeam\tAwayOdds\tRank\tGameTime\t")
 
 	for _, game := range tempC {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%s\t\n", game.HomeTeam, game.HomePrice, game.AwayTeam, game.AwayPrice, game.Rank, game.GameTime.Format(time.RFC1123))
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%s\t\n", game.HomeTeam, game.HomePrice.Round(1), game.AwayTeam, game.AwayPrice.Round(1), game.Rank, game.GameTime.Format(time.RFC1123))
 	}
 
 	w.Flush()
