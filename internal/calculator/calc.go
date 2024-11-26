@@ -7,16 +7,17 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"spikenet.com/nflgo/internal/models"
+
 	"github.com/shopspring/decimal"
 	"golang.org/x/exp/slices"
-	"spikenet.com/nflgo/internal/models"
 )
 
 type CalcArr []models.SingleGame
 
-func (a CalcArr) Len() int           { return len(a) }
-func (a CalcArr) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a CalcArr) Less(i, j int) bool { return a[i].GameTime.Before(a[j].GameTime) }
+func (c CalcArr) Len() int           { return len(c) }
+func (c CalcArr) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
+func (c CalcArr) Less(i, j int) bool { return c[i].GameTime.Before(c[j].GameTime) }
 
 func New() CalcArr {
 	return CalcArr{}
@@ -81,7 +82,7 @@ func (c *CalcArr) PrintRaw() {
 func (c *CalcArr) PrintRanked() {
 	var (
 		rankMap = make(map[float64]models.SingleGame)
-		diffArr = []float64{}
+		diffArr []float64
 		tempC   = *c
 	)
 
